@@ -42,8 +42,7 @@ module Isucon4
 
       def user_locked?(user)
         return nil unless user
-        last_login_id = db.xquery("select id from login_log where user_id = ? AND succeeded = 1 ORDER BY id DESC LIMIT 1", user['id']).first
-        log = db.xquery("SELECT COUNT(1) AS failures FROM login_log WHERE user_id = ? AND id > IFNULL(?, 0);", user['id'], user['id'], last_login_id).first
+        log = db.xquery("SELECT COUNT(1) AS failures FROM login_log WHERE user_id = ? AND id > IFNULL((select id from login_log where user_id = ? AND succeeded = 1 ORDER BY id DESC LIMIT 1), 0);", user['id'], user['id']).first
         config[:user_lock_threshold] <= log['failures']
       end
 
