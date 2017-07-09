@@ -42,8 +42,8 @@ module Isucon4
 
       def user_locked?(user)
         return nil unless user
-        log = db.xquery("SELECT COUNT(1) AS failures FROM login_log WHERE user_id = ? AND id > IFNULL((select id from login_log where user_id = ? AND succeeded = 1 ORDER BY id DESC LIMIT 1), 0);", user['id'], user['id']).first
-
+        last_login_id = db.xquery("select id from login_log where user_id = ? AND succeeded = 1 ORDER BY id DESC LIMIT 1", user['id']).first
+        log = db.xquery("SELECT COUNT(1) AS failures FROM login_log WHERE user_id = ? AND id > IFNULL(?, 0);", user['id'], user['id'], last_login_id).first
         config[:user_lock_threshold] <= log['failures']
       end
 
@@ -93,8 +93,8 @@ module Isucon4
 
       def last_login
         return nil unless current_user
+        db.xquery('SELECT * FROM login_log WHERE user_id = ? AND succeeded = 1 ORDER BY id DESC LIMIT 2', current_user['id']).each.last
 
-        db.xquery('SELECT * FROM login_log WHERE succeeded = 1 AND user_id = ? ORDER BY id DESC LIMIT 2', current_user['id']).each.last
       end
 
       def banned_ips
