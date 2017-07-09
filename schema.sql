@@ -16,6 +16,6 @@ CREATE TABLE IF NOT EXISTS `login_log` (
 
 
 CREATE INDEX log_ip_succ ON login_log (ip,succeeded);
-CREATE INDEX log_login_succ ON login_log (login,succeeded);
+#CREATE INDEX log_login_succ ON login_log (login,succeeded);
 CREATE INDEX log_user_succ ON login_log (user_id,succeeded);
 
